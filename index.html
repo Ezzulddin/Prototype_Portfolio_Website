@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ezzulddin Al-Qaisi | Portfolio</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #0ea5e9; /* Sky Blue */
+            --secondary: #6366f1; /* Indigo */
+            --accent: #10b981; /* Emerald */
+            --dark: #0f172a;
+            --darker: #020617;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background-color: var(--darker);
+            color: #e2e8f0;
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1, h2, h3, .nav-item {
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--darker);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--secondary);
+            border-radius: 4px;
+        }
+
+        /* Canvas Background */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at center, #1e293b 0%, #020617 100%);
+        }
+
+        /* Glassmorphism */
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        /* Tab Animations */
+        .tab-content {
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+        .tab-content.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Nav Item Styles */
+        .nav-item {
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .nav-item::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background-color: var(--primary);
+            transition: width 0.3s ease;
+        }
+        .nav-item:hover::after, .nav-item.active::after {
+            width: 100%;
+        }
+        .nav-item.active {
+            color: var(--primary);
+            text-shadow: 0 0 10px rgba(14, 165, 233, 0.5);
+        }
+
+        /* Experience Card 3D Effect */
+        .exp-card {
+            transition: transform 0.1s;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+        
+        .exp-card-inner {
+            background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%);
+            border: 1px solid rgba(14, 165, 233, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .exp-card:hover .exp-card-inner {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(14, 165, 233, 0.2);
+            background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%);
+        }
+
+        /* Skill Bars */
+        .skill-bar-bg {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 999px;
+            overflow: hidden;
+            height: 8px;
+        }
+        .skill-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            width: 0;
+            transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Floating Icon Animation */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .float-anim {
+            animation: float 4s ease-in-out infinite;
+        }
+
+        /* Typewriter Cursor */
+        .cursor {
+            display: inline-block;
+            width: 3px;
+            background-color: var(--primary);
+            animation: blink 1s step-end infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        /* Modal Styles */
+        .modal-backdrop {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(2, 6, 23, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 50;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .modal-backdrop.open {
+            display: flex;
+            opacity: 1;
+        }
+        .modal-content-box {
+            transform: scale(0.9);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .modal-backdrop.open .modal-content-box {
+            transform: scale(1);
+            opacity: 1;
+        }
+        
+        .form-input {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #e2e8f0;
+            transition: all 0.3s ease;
+        }
+        .form-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(14, 165, 233, 0.2);
+            outline: none;
+            background: rgba(15, 23, 42, 0.9);
+        }
+    </style>
+</head>
+<body class="text-slate-300">
+
+    <!-- Interactive Background -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- Main Container -->
+    <div class="relative min-h-screen flex flex-col md:flex-row max-w-7xl mx-auto p-4 md:p-8 gap-6">
+
+        <!-- Sidebar / Profile Header -->
+        <aside class="w-full md:w-1/4 flex-shrink-0">
+            <div class="glass-panel rounded-2xl p-8 sticky top-8 text-center border-t-4 border-sky-500">
+                <div class="relative w-32 h-32 mx-auto mb-6 rounded-full overflow-hidden ring-4 ring-sky-500/30 shadow-[0_0_30px_rgba(14,165,233,0.3)]">
+                    <!-- Avatar Placeholder -->
+                    <div class="w-full h-full bg-slate-800 flex items-center justify-center text-4xl text-sky-500">
+                        <i class="fa-solid fa-user-astronaut"></i>
+                    </div>
+                </div>
+
+                <h1 class="text-3xl font-bold text-white mb-2 tracking-wide">Ezzulddin <br/><span class="text-sky-400">Al-Qaisi</span></h1>
+                <p class="text-indigo-400 font-semibold mb-6 tracking-widest text-sm">SOFTWARE ENGINEER</p>
+
+                <div class="flex justify-center gap-4 mb-8">
+                    <a href="mailto:ezzuz404@gmail.com" class="w-10 h-10 rounded-full bg-slate-800 hover:bg-sky-600 hover:text-white flex items-center justify-center transition-all duration-300 transform hover:scale-110 border border-slate-700">
+                        <i class="fa-solid fa-envelope"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 rounded-full bg-slate-800 hover:bg-sky-600 hover:text-white flex items-center justify-center transition-all duration-300 transform hover:scale-110 border border-slate-700">
+                        <i class="fa-brands fa-linkedin-in"></i>
+                    </a>
+                    <a href="https://github.com/Ezzulddin" target="_blank" class="w-10 h-10 rounded-full bg-slate-800 hover:bg-sky-600 hover:text-white flex items-center justify-center transition-all duration-300 transform hover:scale-110 border border-slate-700">
+                        <i class="fa-brands fa-github"></i>
+                    </a>
+                </div>
+
+                <div class="text-left space-y-3 text-sm border-t border-slate-700 pt-6">
+                    <div class="flex items-center gap-3 text-slate-400">
+                        <i class="fa-solid fa-location-dot text-sky-500 w-5"></i>
+                        <span>Liverpool, L8 4UN</span>
+                    </div>
+                    <div class="flex items-center gap-3 text-slate-400">
+                        <i class="fa-solid fa-phone text-sky-500 w-5"></i>
+                        <span>(+44) 7368348405</span>
+                    </div>
+                </div>
+
+                <div class="mt-8 pt-6 border-t border-slate-700">
+                    <button onclick="document.getElementById('contact-tab').click()" class="w-full py-3 px-4 bg-gradient-to-r from-sky-600 to-indigo-600 text-white font-bold rounded-lg hover:shadow-[0_0_20px_rgba(14,165,233,0.4)] transition-all duration-300 transform hover:-translate-y-1 font-orbitron">
+                        CONTACT ME
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="w-full md:w-3/4 flex flex-col">
+            
+            <!-- Navigation -->
+            <nav class="glass-panel rounded-xl p-2 mb-6 flex flex-wrap justify-around md:justify-start gap-2 md:gap-8 overflow-x-auto">
+                <button class="nav-item px-4 py-3 text-sm md:text-base uppercase tracking-wider font-bold active" id="about-tab" onclick="switchTab('about')">Profile</button>
+                <button class="nav-item px-4 py-3 text-sm md:text-base uppercase tracking-wider font-bold" id="exp-tab" onclick="switchTab('experience')">Experience</button>
+                <button class="nav-item px-4 py-3 text-sm md:text-base uppercase tracking-wider font-bold" id="skills-tab" onclick="switchTab('skills')">Skills</button>
+                <button class="nav-item px-4 py-3 text-sm md:text-base uppercase tracking-wider font-bold" id="edu-tab" onclick="switchTab('education')">Education</button>
+                <button class="nav-item px-4 py-3 text-sm md:text-base uppercase tracking-wider font-bold" id="achieve-tab" onclick="switchTab('achievements')">Achievements</button>
+                <button class="hidden" id="contact-tab" onclick="switchTab('contact')"></button>
+            </nav>
+
+            <!-- Content Panels -->
+            <div class="flex-grow relative">
+
+                <!-- ABOUT SECTION -->
+                <div id="about" class="tab-content active">
+                    <div class="glass-panel rounded-2xl p-8 mb-6 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
+                            <i class="fa-solid fa-quote-right text-9xl text-white"></i>
+                        </div>
+                        <h2 class="text-3xl text-white font-bold mb-6 border-l-4 border-sky-500 pl-4">Professional Summary</h2>
+                        <p class="text-lg leading-relaxed text-slate-300 mb-6">
+                            I am a dedicated professional who consistently invests maximum effort into my work. Through my experience in collaborative group projects, I've recognized the significance of fostering open communication and respecting diverse perspectives.
+                        </p>
+                        <p class="text-lg leading-relaxed text-slate-300">
+                            I excel in making swift decisions and have a proven ability to sustain high levels of productivity over extended work hours. I am currently seeking opportunities to leverage my software engineering skills in a challenging environment.
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="glass-panel rounded-2xl p-6 border-l-4 border-emerald-500">
+                            <div class="flex items-center gap-4 mb-3">
+                                <div class="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 text-xl">
+                                    <i class="fa-solid fa-users"></i>
+                                </div>
+                                <h3 class="text-xl text-white font-bold">Collaborative</h3>
+                            </div>
+                            <p class="text-sm">Experienced in group projects, fostering open communication and respecting diverse perspectives.</p>
+                        </div>
+                        <div class="glass-panel rounded-2xl p-6 border-l-4 border-purple-500">
+                            <div class="flex items-center gap-4 mb-3">
+                                <div class="w-12 h-12 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 text-xl">
+                                    <i class="fa-solid fa-bolt"></i>
+                                </div>
+                                <h3 class="text-xl text-white font-bold">Productive</h3>
+                            </div>
+                            <p class="text-sm">Proven ability to sustain high levels of productivity over extended work hours and make swift decisions.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- EXPERIENCE SECTION -->
+                <div id="experience" class="tab-content">
+                    <h2 class="text-3xl text-white font-bold mb-8 flex items-center gap-3">
+                        <i class="fa-solid fa-briefcase text-sky-500"></i> Work History
+                    </h2>
+
+                    <!-- Experience Card (New: Verint) -->
+                    <div class="exp-card mb-8 group" onmousemove="handleTilt(event, this)" onmouseleave="resetTilt(this)">
+                        <div class="exp-card-inner rounded-2xl p-8 relative overflow-hidden">
+                            <!-- Background accent -->
+                            <div class="absolute -right-10 -top-10 w-40 h-40 bg-pink-500/10 rounded-full blur-3xl group-hover:bg-pink-500/20 transition-all duration-500"></div>
+                            
+                            <div class="flex flex-col md:flex-row md:items-start md:justify-between mb-4 relative z-10">
+                                <div>
+                                    <h3 class="text-2xl text-white font-bold group-hover:text-pink-400 transition-colors">Software Developer</h3>
+                                    <p class="text-indigo-400 font-semibold text-lg">Verint Systems</p>
+                                </div>
+                                <div class="mt-2 md:mt-0 px-3 py-1 rounded-full bg-pink-500/10 border border-pink-500/30 text-pink-300 text-sm font-bold">
+                                    Full Stack & AI
+                                </div>
+                            </div>
+                            
+                            <div class="relative z-10">
+                                <p class="text-slate-300 mb-4 leading-relaxed">
+                                    Member of the Performance Management (PM) team, engineering backend solutions for coaching modules and scorecards. Gained extensive expertise in DevOps pipelines, database optimization, and cloud infrastructure while handling customer-critical bugs.
+                                </p>
+                                <ul class="space-y-3 text-sm text-slate-400">
+                                    <li class="flex items-start gap-3">
+                                        <i class="fa-solid fa-server text-pink-500 mt-1"></i>
+                                        <span><strong>Backend & Infrastructure:</strong> Managed Jenkins pipelines, utilized Docker/VMs, and migrated legacy database systems to <strong>PostgreSQL</strong> for improved reliability.</span>
+                                    </li>
+                                    <li class="flex items-start gap-3">
+                                        <i class="fa-solid fa-bolt text-pink-500 mt-1"></i>
+                                        <span><strong>High-Scale Analytics:</strong> Implemented <strong>Apache Druid</strong> real-time analytical applications to handle fast queries at scale, optimizing both streaming and batch data loads.</span>
+                                    </li>
+                                    <li class="flex items-start gap-3">
+                                        <i class="fa-solid fa-microchip text-pink-500 mt-1"></i>
+                                        <span><strong>AI Innovation (Hackathon):</strong> Ideated and built a Generative AI feature using <strong>Amazon Bedrock (Llama 3.2)</strong>. Developed the API endpoints to generate intelligent summaries of employee scorecard progress.</span>
+                                    </li>
+                                </ul>
+
+                                <div class="flex flex-wrap gap-2 mt-5">
+                                    <span class="text-xs font-mono text-pink-300 border border-pink-500/30 px-2 py-1 rounded bg-pink-500/5">React/TypeScript</span>
+                                    <span class="text-xs font-mono text-pink-300 border border-pink-500/30 px-2 py-1 rounded bg-pink-500/5">Jenkins</span>
+                                    <span class="text-xs font-mono text-pink-300 border border-pink-500/30 px-2 py-1 rounded bg-pink-500/5">PostgreSQL</span>
+                                    <span class="text-xs font-mono text-pink-300 border border-pink-500/30 px-2 py-1 rounded bg-pink-500/5">Apache Druid</span>
+                                    <span class="text-xs font-mono text-pink-300 border border-pink-500/30 px-2 py-1 rounded bg-pink-500/5">Jira</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Experience Card 1 -->
+                    <div class="exp-card mb-8 group" onmousemove="handleTilt(event, this)" onmouseleave="resetTilt(this)">
+                        <div class="exp-card-inner rounded-2xl p-8 relative overflow-hidden">
+                            <!-- Background accent -->
+                            <div class="absolute -right-10 -top-10 w-40 h-40 bg-sky-500/10 rounded-full blur-3xl group-hover:bg-sky-500/20 transition-all duration-500"></div>
+                            
+                            <div class="flex flex-col md:flex-row md:items-start md:justify-between mb-4 relative z-10">
+                                <div>
+                                    <h3 class="text-2xl text-white font-bold group-hover:text-sky-400 transition-colors">Computer Software Engineer</h3>
+                                    <p class="text-indigo-400 font-semibold text-lg">Red Crab Studio</p>
+                                </div>
+                                <div class="mt-2 md:mt-0 px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/30 text-sky-300 text-sm font-bold">
+                                    Software Engineering
+                                </div>
+                            </div>
+                            
+                            <div class="relative z-10">
+                                <p class="text-slate-300 mb-4 leading-relaxed">
+                                    Worked in developing specialised software that functioned as a CRM suite. This enabled the business to function in the long run by promoting efficiency and enabling a more streamlined data entry system.
+                                </p>
+                                <ul class="space-y-2 text-sm text-slate-400">
+                                    <li class="flex items-center gap-2">
+                                        <i class="fa-solid fa-check text-emerald-500"></i> Backend management of stock
+                                    </li>
+                                    <li class="flex items-center gap-2">
+                                        <i class="fa-solid fa-check text-emerald-500"></i> Front end management for public interface
+                                    </li>
+                                    <li class="flex items-center gap-2">
+                                        <i class="fa-solid fa-check text-emerald-500"></i> Streamlined data entry systems
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Experience Card 2 -->
+                    <div class="exp-card mb-8 group" onmousemove="handleTilt(event, this)" onmouseleave="resetTilt(this)">
+                        <div class="exp-card-inner rounded-2xl p-8 relative overflow-hidden">
+                            <div class="absolute -right-10 -top-10 w-40 h-40 bg-purple-500/10 rounded-full blur-3xl group-hover:bg-purple-500/20 transition-all duration-500"></div>
+                            
+                            <div class="flex flex-col md:flex-row md:items-start md:justify-between mb-4 relative z-10">
+                                <div>
+                                    <h3 class="text-2xl text-white font-bold group-hover:text-purple-400 transition-colors">Retail Assistant</h3>
+                                    <p class="text-indigo-400 font-semibold text-lg">Hull Pound Plus Store</p>
+                                </div>
+                                <div class="mt-2 md:mt-0 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-300 text-sm font-bold">
+                                    Retail & Management
+                                </div>
+                            </div>
+                            
+                            <div class="relative z-10">
+                                <p class="text-slate-300 mb-4 leading-relaxed">
+                                    Primary responsibilities included delivering exceptional customer service, managing transactions, and contributing to effective stock management.
+                                </p>
+                                <ul class="space-y-2 text-sm text-slate-400">
+                                    <li class="flex items-center gap-2">
+                                        <i class="fa-solid fa-check text-emerald-500"></i> Collaborated closely with team members
+                                    </li>
+                                    <li class="flex items-center gap-2">
+                                        <i class="fa-solid fa-check text-emerald-500"></i> Maintained store operations at peak efficiency
+                                    </li>
+                                    <li class="flex items-center gap-2">
+                                        <i class="fa-solid fa-check text-emerald-500"></i> Provided top-tier customer service
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Professional Development -->
+                    <h2 class="text-2xl text-white font-bold mb-6 mt-10 border-b border-slate-700 pb-2">Professional Development</h2>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="glass-panel p-6 rounded-xl hover:bg-slate-800/50 transition-colors">
+                            <div class="text-sky-500 text-sm font-bold mb-1">NOV 2024 • MANCHESTER</div>
+                            <h3 class="text-xl font-bold text-white mb-2">BNY Mellon Hackathon</h3>
+                            <p class="text-sm text-slate-400 mb-4">
+                                Engaged in a dynamic, all-day hackathon focusing on innovative solutions in financial services. Included cybercrime simulation and recruitment workshops.
+                            </p>
+                            <span class="text-xs font-mono text-emerald-400 border border-emerald-500/30 px-2 py-1 rounded">Problem Solving</span>
+                        </div>
+                        
+                        <div class="glass-panel p-6 rounded-xl hover:bg-slate-800/50 transition-colors">
+                            <div class="text-sky-500 text-sm font-bold mb-1">OCT 2024 • LIVERPOOL SCIENCE PARK</div>
+                            <h3 class="text-xl font-bold text-white mb-2">Ultamation Coding Challenge</h3>
+                            <p class="text-sm text-slate-400 mb-4">
+                                Competed in an exclusive coding challenge by Ultamation. Developed real-world solutions with limited guidance, furthering technical proficiency.
+                            </p>
+                            <span class="text-xs font-mono text-emerald-400 border border-emerald-500/30 px-2 py-1 rounded">Automation</span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- SKILLS SECTION -->
+                <div id="skills" class="tab-content">
+                    <div class="glass-panel rounded-2xl p-8">
+                        <h2 class="text-3xl text-white font-bold mb-8">Technical Arsenal</h2>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
+                            
+                            <!-- Skill Item -->
+                            <div class="mb-2">
+                                <div class="flex justify-between mb-2">
+                                    <span class="font-bold text-white"><i class="fa-brands fa-cuttlefish text-sky-500 mr-2"></i> C# / .NET</span>
+                                    <span class="text-sky-400">Advanced</span>
+                                </div>
+                                <div class="skill-bar-bg">
+                                    <div class="skill-bar-fill" style="width: 90%"></div>
+                                </div>
+                            </div>
+
+                            <!-- Skill Item -->
+                            <div class="mb-2">
+                                <div class="flex justify-between mb-2">
+                                    <span class="font-bold text-white"><i class="fa-brands fa-python text-yellow-500 mr-2"></i> Python</span>
+                                    <span class="text-sky-400">Proficient</span>
+                                </div>
+                                <div class="skill-bar-bg">
+                                    <div class="skill-bar-fill" style="width: 85%"></div>
+                                </div>
+                            </div>
+
+                            <!-- Skill Item -->
+                            <div class="mb-2">
+                                <div class="flex justify-between mb-2">
+                                    <span class="font-bold text-white"><i class="fa-brands fa-js text-yellow-300 mr-2"></i> Java / JavaScript</span>
+                                    <span class="text-sky-400">Proficient</span>
+                                </div>
+                                <div class="skill-bar-bg">
+                                    <div class="skill-bar-fill" style="width: 80%"></div>
+                                </div>
+                            </div>
+
+                            <!-- Skill Item -->
+                            <div class="mb-2">
+                                <div class="flex justify-between mb-2">
+                                    <span class="font-bold text-white"><i class="fa-solid fa-code text-orange-500 mr-2"></i> C / C++</span>
+                                    <span class="text-sky-400">Competent</span>
+                                </div>
+                                <div class="skill-bar-bg">
+                                    <div class="skill-bar-fill" style="width: 75%"></div>
+                                </div>
+                            </div>
+
+                            <!-- Skill Item -->
+                            <div class="mb-2">
+                                <div class="flex justify-between mb-2">
+                                    <span class="font-bold text-white"><i class="fa-brands fa-html5 text-orange-600 mr-2"></i> HTML / CSS</span>
+                                    <span class="text-sky-400">Proficient</span>
+                                </div>
+                                <div class="skill-bar-bg">
+                                    <div class="skill-bar-fill" style="width: 85%"></div>
+                                </div>
+                            </div>
+
+                             <!-- Skill Item -->
+                             <div class="mb-2">
+                                <div class="flex justify-between mb-2">
+                                    <span class="font-bold text-white"><i class="fa-solid fa-gamepad text-purple-500 mr-2"></i> MonoGame</span>
+                                    <span class="text-sky-400">Project Leader</span>
+                                </div>
+                                <div class="skill-bar-bg">
+                                    <div class="skill-bar-fill" style="width: 80%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h3 class="text-xl text-white font-bold mt-10 mb-4 border-t border-slate-700 pt-6">Soft Skills</h3>
+                        <div class="flex flex-wrap gap-3">
+                            <span class="px-4 py-2 rounded-full bg-slate-800 border border-slate-600 text-slate-200">Team Building</span>
+                            <span class="px-4 py-2 rounded-full bg-slate-800 border border-slate-600 text-slate-200">Communication</span>
+                            <span class="px-4 py-2 rounded-full bg-slate-800 border border-slate-600 text-slate-200">Effective Leadership</span>
+                            <span class="px-4 py-2 rounded-full bg-slate-800 border border-slate-600 text-slate-200">Customer Focused</span>
+                            <span class="px-4 py-2 rounded-full bg-slate-800 border border-slate-600 text-slate-200">Dedication</span>
+                        </div>
+
+                        <h3 class="text-xl text-white font-bold mt-10 mb-4 border-t border-slate-700 pt-6">Languages</h3>
+                        <div class="flex gap-6">
+                            <div class="flex items-center gap-2">
+                                <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                                <span>English (Fluent)</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                                <span>Arabic (Fluent)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- EDUCATION SECTION -->
+                <div id="education" class="tab-content">
+                    <h2 class="text-3xl text-white font-bold mb-8">Academic Journey</h2>
+
+                    <div class="relative border-l-2 border-slate-700 ml-3 md:ml-6 space-y-12 pb-6">
+                        
+                        <!-- Timeline Item 1 -->
+                        <div class="relative pl-8 md:pl-12">
+                            <!-- Dot -->
+                            <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-sky-500 ring-4 ring-slate-900"></div>
+                            
+                            <div class="glass-panel p-6 rounded-xl hover:-translate-y-1 transition-transform duration-300">
+                                <span class="text-sky-400 font-bold text-sm tracking-widest">SEPT 2021 - JULY 2023</span>
+                                <h3 class="text-2xl text-white font-bold mt-1">A-Levels</h3>
+                                <p class="text-indigo-300 font-medium mb-4">St Mary's College, HU6 7TN</p>
+                                
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div class="bg-slate-800/50 p-3 rounded border border-slate-700">
+                                        <div class="text-xs text-slate-400">Mathematics</div>
+                                        <div class="text-white font-bold">Grade A</div>
+                                    </div>
+                                    <div class="bg-slate-800/50 p-3 rounded border border-slate-700">
+                                        <div class="text-xs text-slate-400">Computer Science</div>
+                                        <div class="text-white font-bold">Grade B</div>
+                                    </div>
+                                    <div class="bg-slate-800/50 p-3 rounded border border-slate-700 sm:col-span-2">
+                                        <div class="text-xs text-slate-400">BTEC Arts & Design</div>
+                                        <div class="text-white font-bold">Distinction</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Timeline Item 2 -->
+                        <div class="relative pl-8 md:pl-12">
+                            <!-- Dot -->
+                            <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-slate-600 ring-4 ring-slate-900"></div>
+                            
+                            <div class="glass-panel p-6 rounded-xl hover:-translate-y-1 transition-transform duration-300">
+                                <span class="text-slate-400 font-bold text-sm tracking-widest">SEPT 2016 - MAY 2021</span>
+                                <h3 class="text-2xl text-white font-bold mt-1">GCSEs</h3>
+                                <p class="text-indigo-300 font-medium mb-4">Buckingham School, MK18 1AT</p>
+                                
+                                <ul class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-sm text-slate-300">
+                                    <li>• Mathematics: <span class="text-white font-bold">Grade 7</span></li>
+                                    <li>• Computer Science: <span class="text-white font-bold">Grade 7</span></li>
+                                    <li>• BTEC Enterprise: <span class="text-white font-bold">Distinction 2</span></li>
+                                    <li>• English Language: <span class="text-white">Grade 4</span></li>
+                                    <li>• Combined Science: <span class="text-white">Grade 5/4</span></li>
+                                </ul>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- ACHIEVEMENTS SECTION -->
+                <div id="achievements" class="tab-content">
+                    <div class="glass-panel rounded-2xl p-1 overflow-hidden">
+                        <div class="bg-gradient-to-r from-indigo-900 to-slate-900 p-8 md:p-12 text-center relative overflow-hidden">
+                            <!-- Background Pattern -->
+                            <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(#4f46e5 1px, transparent 1px); background-size: 20px 20px;"></div>
+                            
+                            <div class="relative z-10 float-anim">
+                                <i class="fa-solid fa-trophy text-6xl text-yellow-400 mb-6 drop-shadow-[0_0_15px_rgba(250,204,21,0.5)]"></i>
+                            </div>
+                            
+                            <h2 class="relative z-10 text-3xl md:text-4xl text-white font-bold mb-4">Computer Science Project Leader</h2>
+                            <div class="relative z-10 w-20 h-1 bg-yellow-400 mx-auto mb-6"></div>
+                            
+                            <p class="relative z-10 text-lg text-slate-300 max-w-2xl mx-auto mb-8 leading-relaxed">
+                                Innovatively conceived and led a team project leveraging <span class="text-white font-bold">MonoGame in C#</span>. 
+                            </p>
+
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 relative z-10 text-left">
+                                <div class="bg-slate-800/80 p-5 rounded-lg border border-slate-700 hover:border-sky-500 transition-colors">
+                                    <i class="fa-solid fa-route text-sky-400 text-2xl mb-3"></i>
+                                    <h4 class="text-white font-bold">A* Algorithm</h4>
+                                    <p class="text-xs text-slate-400 mt-1">Implemented A* shortest path algorithm for intelligent movement.</p>
+                                </div>
+                                <div class="bg-slate-800/80 p-5 rounded-lg border border-slate-700 hover:border-purple-500 transition-colors">
+                                    <i class="fa-solid fa-brain text-purple-400 text-2xl mb-3"></i>
+                                    <h4 class="text-white font-bold">AI Narrative</h4>
+                                    <p class="text-xs text-slate-400 mt-1">Crafted engaging narratives using AI trained on books and game lore.</p>
+                                </div>
+                                <div class="bg-slate-800/80 p-5 rounded-lg border border-slate-700 hover:border-emerald-500 transition-colors">
+                                    <i class="fa-solid fa-people-group text-emerald-400 text-2xl mb-3"></i>
+                                    <h4 class="text-white font-bold">Leadership</h4>
+                                    <p class="text-xs text-slate-400 mt-1">Managed team dynamics and project timeline to successful completion.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CONTACT SECTION (Hidden initially) -->
+                <div id="contact" class="tab-content">
+                    <div class="glass-panel rounded-2xl p-8 text-center">
+                        <h2 class="text-3xl text-white font-bold mb-6">Get In Touch</h2>
+                        <p class="text-slate-300 mb-8 max-w-lg mx-auto">
+                            I am currently open to new opportunities in software engineering. Whether you have a question or just want to say hi, I'll try my best to get back to you!
+                        </p>
+                        
+                        <!-- Updated Button triggers modal -->
+                        <button onclick="openModal()" class="inline-block py-4 px-8 bg-sky-500 hover:bg-sky-400 text-white font-bold rounded-full transition-all duration-300 shadow-[0_0_20px_rgba(14,165,233,0.4)] hover:shadow-[0_0_30px_rgba(14,165,233,0.6)] transform hover:-translate-y-1">
+                            <i class="fa-solid fa-paper-plane mr-2"></i> Say Hello
+                        </button>
+
+                        <div class="mt-12 flex flex-col gap-4 items-center">
+                            <div class="flex items-center gap-3 text-slate-400">
+                                <i class="fa-solid fa-envelope text-sky-500"></i> ezzuz404@gmail.com
+                            </div>
+                            <div class="flex items-center gap-3 text-slate-400">
+                                <i class="fa-solid fa-phone text-sky-500"></i> (+44) 7368348405
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Footer -->
+            <footer class="mt-8 text-center text-slate-600 text-xs py-4">
+                <p>&copy; 2025 Ezzulddin Al-Qaisi. Built with <i class="fa-solid fa-heart text-red-900"></i> and Code.</p>
+            </footer>
+
+        </main>
+    </div>
+
+    <!-- Contact Modal -->
+    <div id="contact-modal" class="modal-backdrop" onclick="if(event.target === this) closeModal()">
+        <div class="modal-content-box glass-panel rounded-2xl p-8 w-full max-w-lg mx-4 relative border-t-4 border-sky-500 shadow-[0_0_50px_rgba(0,0,0,0.5)]">
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            
+            <h3 class="text-2xl text-white font-bold mb-2 font-orbitron">Contact Hub</h3>
+            <p class="text-sm text-slate-400 mb-6">Initialize communication link. Message will be decrypted and sent to Ezzulddin.</p>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-sky-500 mb-1 uppercase tracking-wider">Your Identity</label>
+                    <input type="text" id="modal-name" class="w-full p-3 rounded-lg form-input" placeholder="Name or Organization">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-sky-500 mb-1 uppercase tracking-wider">Subject Protocol</label>
+                    <input type="text" id="modal-subject" class="w-full p-3 rounded-lg form-input" placeholder="Project Inquiry / Job Opportunity">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-sky-500 mb-1 uppercase tracking-wider">Transmission Data</label>
+                    <textarea id="modal-message" rows="4" class="w-full p-3 rounded-lg form-input" placeholder="Type your message here..."></textarea>
+                </div>
+                
+                <button onclick="sendMail()" id="send-btn" class="w-full py-3 mt-4 bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white font-bold rounded-lg shadow-lg hover:shadow-sky-500/30 transition-all duration-300 flex items-center justify-center gap-2 group">
+                    <span>TRANSMIT MESSAGE</span>
+                    <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // Tab Switching Logic
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => {
+                el.classList.remove('active');
+                el.style.display = 'none';
+            });
+            
+            document.querySelectorAll('.nav-item').forEach(el => {
+                el.classList.remove('active');
+            });
+
+            const activeContent = document.getElementById(tabId);
+            activeContent.style.display = 'block';
+            
+            setTimeout(() => {
+                activeContent.classList.add('active');
+            }, 10);
+
+            const btn = document.querySelector(`button[onclick="switchTab('${tabId}')"]`);
+            if(btn) btn.classList.add('active');
+        }
+
+        // Modal Logic
+        const modal = document.getElementById('contact-modal');
+        const modalContent = document.querySelector('.modal-content-box');
+
+        function openModal() {
+            modal.classList.add('open');
+            // Reset fields
+            document.getElementById('modal-name').value = '';
+            document.getElementById('modal-subject').value = '';
+            document.getElementById('modal-message').value = '';
+        }
+
+        function closeModal() {
+            modal.classList.remove('open');
+        }
+
+        function sendMail() {
+            const name = document.getElementById('modal-name').value;
+            const subject = document.getElementById('modal-subject').value;
+            const message = document.getElementById('modal-message').value;
+            const btn = document.getElementById('send-btn');
+            const originalText = '<span>TRANSMIT MESSAGE</span><i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>';
+
+            // Simple validation
+            if(!message || !name) {
+                alert("Transmission failed: Please ensure Name and Message fields are filled.");
+                return;
+            }
+
+            // Animation - Loading State
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> ENCRYPTING & TRANSMITTING...';
+            btn.disabled = true;
+            btn.style.opacity = '0.8';
+            
+            // Using FormSubmit.co AJAX API
+            fetch("https://formsubmit.co/ajax/ezzuz404@gmail.com", {
+                method: "POST",
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    name: name,
+                    _subject: subject || "New Portfolio Contact", // Default subject if empty
+                    message: message,
+                    _template: "table" // Makes the email look nicer
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Success State
+                btn.innerHTML = '<i class="fa-solid fa-check"></i> TRANSMISSION SUCCESSFUL';
+                btn.classList.remove('from-sky-600', 'to-indigo-600');
+                btn.classList.add('bg-emerald-600'); // Turn green
+                
+                setTimeout(() => {
+                    closeModal();
+                    // Reset button style after closing
+                    setTimeout(() => {
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                        btn.style.opacity = '1';
+                        btn.classList.add('from-sky-600', 'to-indigo-600');
+                        btn.classList.remove('bg-emerald-600');
+                    }, 500);
+                }, 2000);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Error State
+                btn.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> TRANSMISSION FAILED';
+                btn.classList.remove('from-sky-600', 'to-indigo-600');
+                btn.classList.add('bg-red-600'); // Turn red
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                    btn.classList.add('from-sky-600', 'to-indigo-600');
+                    btn.classList.remove('bg-red-600');
+                }, 3000);
+            });
+        }
+
+        // 3D Tilt Effect for Cards
+        function handleTilt(e, card) {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            
+            const rotateX = ((y - centerY) / centerY) * -10; // Max rotation deg
+            const rotateY = ((x - centerX) / centerX) * 10;
+
+            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        }
+
+        function resetTilt(card) {
+            card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg)`;
+        }
+
+        // Canvas Background Animation
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let particles = [];
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.vx = (Math.random() - 0.5) * 0.5;
+                this.vy = (Math.random() - 0.5) * 0.5;
+                this.size = Math.random() * 2 + 1;
+                this.color = Math.random() > 0.5 ? 'rgba(14, 165, 233, ' : 'rgba(99, 102, 241, '; // Sky or Indigo
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+
+                if (this.x < 0 || this.x > width) this.vx *= -1;
+                if (this.y < 0 || this.y > height) this.vy *= -1;
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color + '0.5)';
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < 60; i++) {
+            particles.push(new Particle());
+        }
+
+        let mouse = { x: null, y: null };
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+        });
+
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+
+            particles.forEach((p, index) => {
+                p.update();
+                p.draw();
+
+                for (let j = index; j < particles.length; j++) {
+                    const p2 = particles[j];
+                    const dx = p.x - p2.x;
+                    const dy = p.y - p2.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < 100) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = `rgba(255, 255, 255, ${0.1 - dist/1000})`;
+                        ctx.lineWidth = 1;
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.stroke();
+                    }
+                }
+
+                if (mouse.x != null) {
+                    const dx = p.x - mouse.x;
+                    const dy = p.y - mouse.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 150) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = `rgba(14, 165, 233, ${0.2 - dist/1000})`; // Cyan glow
+                        ctx.lineWidth = 1;
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(mouse.x, mouse.y);
+                        ctx.stroke();
+                    }
+                }
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+
+        // Trigger animations on load
+        window.addEventListener('load', () => {
+            // Animate skill bars when tab is switched to skills
+            document.getElementById('skills-tab').addEventListener('click', () => {
+                setTimeout(() => {
+                    document.querySelectorAll('.skill-bar-fill').forEach(bar => {
+                        // Reset width to trigger transition
+                        const targetWidth = bar.style.width;
+                        bar.style.width = '0';
+                        setTimeout(() => bar.style.width = targetWidth, 100);
+                    });
+                }, 100);
+            });
+        });
+
+    </script>
+</body>
+</html>
